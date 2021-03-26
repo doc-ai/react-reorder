@@ -246,7 +246,7 @@
     function startDrag (reorderId, reorderGroup, index, element, component) {
       target = component;
 
-      // Disable draggin for items with [disabled] props
+      // Disable dragging for items with [disabled] props
       if (element.props.disabled) {
         return;
       }
@@ -488,6 +488,7 @@
 
       findCollisionIndex: function (event, listElements) {
         for (var i = 0; i < listElements.length; i += 1) {
+          // Skip placeholders, current and disabled items
           if (
             !listElements[i].getAttribute('data-placeholder')
             && !listElements[i].getAttribute('data-dragged')
