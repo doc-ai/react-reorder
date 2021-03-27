@@ -71,6 +71,7 @@ import Reorder, {
   autoScroll={true} // Enable auto-scrolling when the pointer is close to the edge of the Reorder component (optional), defaults to true
   disabled={false} // Disable reordering (optional), defaults to false
   disableContextMenus={true} // Disable context menus when holding on touch devices (optional), defaults to true
+  disableDrop={false} // Disable accepting drop (and reorder) to use as a draggable source list (optional)
   placeholder={
     <div className="custom-placeholder" /> // Custom placeholder element (optional), defaults to clone of dragged element
   }

@@ -246,6 +246,11 @@
     function startDrag (reorderId, reorderGroup, index, element, component) {
       target = component;
 
+      // Disable dragging for items with [disabled] props
+      if (element.props.disabled) {
+        return;
+      }
+
       clearInterval(scrollInterval);
       scrollInterval = setInterval(autoScroll, CONSTANTS.SCROLL_INTERVAL);
 
@@ -483,7 +488,12 @@
 
       findCollisionIndex: function (event, listElements) {
         for (var i = 0; i < listElements.length; i += 1) {
-          if (!listElements[i].getAttribute('data-placeholder') && !listElements[i].getAttribute('data-dragged')) {
+          // Skip placeholders, current and disabled items
+          if (
+            !listElements[i].getAttribute('data-placeholder')
+            && !listElements[i].getAttribute('data-dragged')
+            && !listElements[i].hasAttribute('disabled')
+          ) {
 
             var rect = listElements[i].getBoundingClientRect();
 
@@ -627,7 +637,7 @@
           this.moved = true;
         }
 
-        if (this.isDragging() && this.isInvolvedInDragging()) {
+        if (!this.props.disableDrop && this.isDragging() && this.isInvolvedInDragging()) {
           this.preventNativeScrolling(event);
 
           var element = this.rootNode;
@@ -750,17 +760,33 @@
 
         var placeholderElement = this.props.placeholder || this.state.draggedElement;
 
-        if (this.isPlacing() && this.isPlacingTo() && placeholderElement) {
-          var placeholder = React.cloneElement(
-            placeholderElement,
-            {
-              key: 'react-reorder-placeholder',
-              className: [placeholderElement.props.className || '', this.props.placeholderClassName].join(' '),
-              'data-placeholder': true
-            }
-          );
+        if (this.props.disableDrop) {
+          // Only render item clone at the same position when draggin from the list
+          if (this.isPlacing() && this.isDraggingFrom()) {
+            var placeholder = React.cloneElement(
+              this.state.draggedElement,
+              {
+                key: 'react-reorder-placeholder',
+                className: [placeholderElement.props.className || '', this.props.placeholderClassName].join(' '),
+                'data-placeholder': true
+              }
+            );
 
-          children.splice(this.state.placedIndex, 0, placeholder);
+            children.splice(this.state.draggedIndex, 0, placeholder);
+          }
+        } else {
+          if (this.isPlacing() && this.isPlacingTo() && placeholderElement) {
+            var placeholder = React.cloneElement(
+              placeholderElement,
+              {
+                key: 'react-reorder-placeholder',
+                className: [placeholderElement.props.className || '', this.props.placeholderClassName].join(' '),
+                'data-placeholder': true
+              }
+            );
+
+            children.splice(this.state.placedIndex, 0, placeholder);
+          }
         }
 
         return React.createElement(
@@ -797,7 +823,8 @@
       autoScroll: PropTypes.bool,
       autoScrollParents: PropTypes.bool,
       disabled: PropTypes.bool,
-      disableContextMenus: PropTypes.bool
+      disableContextMenus: PropTypes.bool,
+      disableDrop: PropTypes.bool
     };
 
     Reorder.defaultProps = {
@@ -818,7 +845,8 @@
       // This is very slow if nested > 8 levels deep in DOM, avoid using
       autoScrollParents: false,
       disabled: false,
-      disableContextMenus: true
+      disableContextMenus: true,
+      disableDrop: false
     };
 
     return Reorder;
