@@ -62,6 +62,7 @@ import Reorder, {
   getRef={this.storeRef.bind(this)} // Function that is passed a reference to the root node when mounted (optional)
   component="ul" // Tag name or Component to be used for the wrapping element (optional), defaults to 'div'
   placeholderClassName="placeholder" // Class name to be applied to placeholder elements (optional), defaults to 'placeholder'
+  dragHandlerClassName="handler" // Class name that the draggable element can be dragged by (optional), defaults to null (i.e. entire element is draggable)
   draggedClassName="dragged" // Class name to be applied to dragged elements (optional), defaults to 'dragged'
   lock="horizontal" // Lock the dragging direction (optional): vertical, horizontal (do not use with groups)
   holdTime={500} // Default hold time before dragging begins (mouse & touch) (optional), defaults to 0

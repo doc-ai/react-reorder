@@ -246,11 +246,6 @@
     function startDrag (reorderId, reorderGroup, index, element, component) {
       target = component;
 
-      // Disable dragging for items with [disabled] props
-      if (element.props.disabled) {
-        return;
-      }
-
       clearInterval(scrollInterval);
       scrollInterval = setInterval(autoScroll, CONSTANTS.SCROLL_INTERVAL);
 
@@ -540,6 +535,14 @@
       startDrag: function (event, target, index) {
         if (!this.moved) {
           var rect = target.getBoundingClientRect();
+          var element = this.props.children[index];
+          var isHandler = this.props.dragHandleClassName
+            && event.target.closest('.' + this.props.dragHandleClassName);
+
+          // Disable dragging for items with [disabled] props
+          if (element.props.disabled || (this.props.dragHandleClassName && !isHandler)) {
+            return;
+          }
 
           var draggedStyle = {
             position: 'fixed',
@@ -550,7 +553,7 @@
             zIndex: 100
           };
 
-          store.startDrag(this.props.reorderId, this.props.reorderGroup, index, this.props.children[index], this);
+          store.startDrag(this.props.reorderId, this.props.reorderGroup, index, element, this);
           store.setDraggedStyle(this.props.reorderId, this.props.reorderGroup, draggedStyle);
 
           mouseOffset = {
@@ -763,18 +766,11 @@
         if (this.props.disableDrop) {
           // Only render item clone at the same position when draggin from the list
           if (this.isPlacing() && this.isDraggingFrom()) {
-            var placeholder = React.cloneElement(
-              this.state.draggedElement,
-              {
-                key: 'react-reorder-placeholder',
-                className: [placeholderElement.props.className || '', this.props.placeholderClassName].join(' '),
-                'data-placeholder': true
-              }
-            );
-
-            children.splice(this.state.draggedIndex, 0, placeholder);
+            var clone = React.cloneElement(this.state.draggedElement);
+            children.splice(this.state.draggedIndex, 0, clone);
           }
         } else {
+          // Render the placeholder or clone, depending on config
           if (this.isPlacing() && this.isPlacingTo() && placeholderElement) {
             var placeholder = React.cloneElement(
               placeholderElement,
@@ -805,14 +801,15 @@
 
     Reorder.propTypes = {
       component: PropTypes.oneOfType([
-        PropTypes.func, 
-        PropTypes.object, 
-        PropTypes.string,
+        PropTypes.func,
+        PropTypes.object,
+        PropTypes.string
       ]),
       getRef: PropTypes.func,
       reorderId: PropTypes.string,
       reorderGroup: PropTypes.string,
       placeholderClassName: PropTypes.string,
+      dragHandleClassName: PropTypes.string,
       draggedClassName: PropTypes.string,
       lock: PropTypes.string,
       holdTime: PropTypes.number,
@@ -833,6 +830,7 @@
       // reorderId: id,
       // reorderGroup: group,
       placeholderClassName: 'placeholder',
+      dragHandleClassName: null,
       draggedClassName: 'dragged',
       // lock: direction,
       holdTime: 0,

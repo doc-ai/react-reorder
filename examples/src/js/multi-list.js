@@ -60,6 +60,7 @@ export class MultiList extends Component {
           component="ul"
           className={[classNames.myList, classNames.multiList].join(' ')}
           placeholderClassName={classNames.placeholder}
+          dragHandleClassName="handle"
           draggedClassName={classNames.dragged}
           onReorder={this.onReorderGroup.bind(this)}
         >
@@ -71,6 +72,10 @@ export class MultiList extends Component {
                 style={{color: color}}
               >
                 <div className={classNames.contentHolder}>
+                  <span className="handle">
+                    <strong>==</strong>
+                  </span>
+                  
                   <span className={classNames.itemName}>
                     {name}
                   </span>
@@ -93,6 +98,7 @@ export class MultiList extends Component {
           placeholderClassName={classNames.placeholder}
           draggedClassName={classNames.dragged}
           onReorder={this.onReorderGroup.bind(this)}
+          disableDrop
         >
           {
             this.state.listB.map(({name, color}) => (
